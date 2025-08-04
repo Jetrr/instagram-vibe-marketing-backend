@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-
 FROM python:3.11-slim
 
 # Install system dependencies (for Pillow, cryptography, etc.)
@@ -23,10 +21,10 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY . .
 
 # (Optional) expose port 80 for uvicorn
-EXPOSE 80
+EXPOSE 8080
 
 # Default command:
 # -host 0.0.0.0 (allow external access)
 # -port 80
 # --reload only in dev! Remove in prod!
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
