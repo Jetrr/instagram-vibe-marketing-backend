@@ -1,53 +1,40 @@
-# from fastapi import APIRouter, HTTPException
-# from google.cloud import firestore
-# from typing import List, Dict
-# from schemas.persona import ContentHistoryEntry
-# import os
-# print("Credentials:", os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
-# db = firestore.Client()
-# print("Firestore client initialized")
-# ref = db.collection('persona')
-# print("Collections accessed")
-# for doc in ref.stream():
-#     print(doc.id, doc.to_dict())
-# db = firestore.Client() 
+from google.cloud import firestore
+from typing import List, Dict
+from schemas.persona import ContentHistoryEntry
 
-# def add_content_history(persona_id: str, entry: ContentHistoryEntry):
-#     doc_ref = db.collection('persona').document(persona_id)
-#     doc = doc_ref.get()
-#     if doc.exists:
-#         doc_ref.update({
-#             "content_history": firestore.ArrayUnion([entry.dict()])
-#         })
-#     else:
-#         doc_ref.set({
-#             "content_history": [entry.dict()]
-#         })
+db = firestore.Client(project="instagram-vibe-marketing-db")
 
-# def fetch_content_history(persona_id: str) -> List[Dict]:
-#     doc_ref = db.collection('persona').document(persona_id)
-#     doc = doc_ref.get()
-#     if not doc.exists:
-#         return []
-#     data = doc.to_dict()
-#     return data.get("content_history", [])
+def add_content_history(persona_id: str, entry: ContentHistoryEntry):
+    doc_ref = db.collection('persona').document(persona_id)
+    doc = doc_ref.get()
+    if doc.exists:
+        doc_ref.update({
+            "content_history": firestore.ArrayUnion([entry.dict()])
+        })
+    else:
+        doc_ref.set({
+            "content_history": [entry.dict()]
+        })
 
-# def get_system_prompt(persona_id: str) -> str:
-#     print('---UPDATE')
-#     doc_ref = db.collection('persona').document(persona_id)
-#     doc = doc_ref.get()
-#     if not doc.exists:
-#         print("Persona not found")
-#         raise ValueError("Persona not found")
-#     data = doc.to_dict()
-#     print("DATA", data)
-#     history = data.get("content_history", [])
-#     print("HISTORY", history)
-#     if not history:
-#         print("Empty history")
-#         raise ValueError("No content history")
-#     first = history[0]
-#     print("FIRST ENTRY", first)
-#     return first.get("system_prompt", "")
+def fetch_content_history(persona_id: str) -> List[Dict]:
+    doc_ref = db.collection('persona').document(persona_id)
+    doc = doc_ref.get()
+    if not doc.exists:
+        return []
+    data = doc.to_dict()
+    return data.get("content_history", [])
 
-    
+def get_system_prompt(persona_id: str) -> str:
+    doc_ref = db.collection('persona').document(persona_id)
+    doc = doc_ref.get()
+    if not doc.exists:
+        raise ValueError("Persona not found")
+    data = doc.to_dict()
+    # If you store `system_prompt` at document level:
+    if "system_prompt" in data:
+        return data["system_prompt"]
+    # Or if in first entry of content_history:
+    history = data.get("content_history", [])
+    if history and "system_prompt" in history[0]:
+        return history[0]["system_prompt"]
+    raise ValueError("No system prompt found")
