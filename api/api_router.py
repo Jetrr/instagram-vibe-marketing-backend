@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from endpoints import carousel, instagram_post
+from endpoints import carousel, instagram_post, persona
 
 api_router = APIRouter()
 
