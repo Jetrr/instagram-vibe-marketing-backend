@@ -2,7 +2,7 @@ from google.cloud import firestore
 from typing import List, Dict
 from schemas.persona import ContentHistoryEntry
 
-db = firestore.Client(project="instagram-vibe-marketing-db")
+db = firestore.Client(project='jetrr-ai-agent')
 
 def add_content_history(persona_id: str, entry: ContentHistoryEntry):
     doc_ref = db.collection('persona').document(persona_id)
