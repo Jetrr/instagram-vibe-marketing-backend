@@ -14,3 +14,13 @@ class PostCarouselRequest(BaseModel):
     caption: str = Field(..., description="Post caption")
     content: List[ContentObject] = Field(..., description="List of content")
     collaborators: Optional[str] = Field(None, description="Comma-separated list of collaborator IG IDs")
+
+class VideoCarouselItem(BaseModel):
+    vid_url: str
+
+class PostVideoCarouselRequest(BaseModel):
+    IG_ID: str
+    access_token: str
+    caption: str
+    content: List[VideoCarouselItem]
+    collaborators: str = None   # Optional, if you wish

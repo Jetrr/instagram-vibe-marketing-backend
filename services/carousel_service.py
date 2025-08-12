@@ -18,3 +18,4 @@ def create_carousel(payload: CarouselRequest):
         img_bytes.seek(0)
         images_data.append(img_bytes)
     return images_data
+
