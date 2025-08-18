@@ -92,7 +92,7 @@ class GenerationService:
             urls.append(url)
 
         return ImageGenerationResponse(
-            images=urls,  # Now URLs instead of base64 strings
+            images=urls,  
             mime_type="image/png",
             metadata={"provider": "openai", "model": model, "size": size, "n": str(n)},
         )
