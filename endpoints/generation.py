@@ -34,7 +34,6 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from services.generation_service import VertexVideoService
 
-router = APIRouter()
 
 class VideoFromImageRequest(BaseModel):
     prompt: str
