@@ -1,31 +1,23 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
-from schemas.generation import ImageGenerationResponse
+from schemas.generation import ImageGenerationResponse, ImageEditRequest
 from services.generation_service import GenerationService, fetch_and_upload_image
 
 router = APIRouter()
 
 @router.post("/image", response_model=ImageGenerationResponse)
-async def edit_sample_image(
-    prompt: str = Form(...),
-    n: int = Form(1),
-    size: str = Form("1024x1024"),
-    quality: str = Form("high"),
-    background: str = Form("auto"),
-    model: str = Form("gpt-image-1"),
-):
+async def edit_sample_image(request: ImageEditRequest):
     """
     Endpoint to edit/generate an image using a fixed sample image.
     """
     sample_image_path = "./assets/sample/sample1.png"
     return await GenerationService.openai_image_edit(
         image=sample_image_path,
-        prompt=prompt,
-        n=n,
-        size=size,
-        quality=quality,
-        background=background,
-        model=model,
-        mask=None,
+        prompt=request.prompt,
+        n=request.n,
+        size=request.size,
+        quality=request.quality,
+        background=request.background,
+        model=request.model,
     )
 
 #video 

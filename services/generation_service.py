@@ -35,7 +35,6 @@ class GenerationService:
         quality: str,
         background: str,
         model: str,
-        mask: Union[str, IO, None] = None,
     ) -> ImageGenerationResponse:
         api_key = _get_openai_api_key()
         if not api_key:
@@ -48,13 +47,7 @@ class GenerationService:
             else:
                 image_file = image
                 image_file.seek(0)
-            mask_file = None
-            if mask is not None:
-                if isinstance(mask, str):
-                    mask_file = open(mask, "rb")
-                else:
-                    mask.seek(0)
-                    mask_file = mask
+            
 
             edit_kwargs = dict(
                 image=image_file,
@@ -65,8 +58,6 @@ class GenerationService:
                 quality=quality,
                 background=background,
             )
-            if mask_file is not None:
-                edit_kwargs["mask"] = mask_file
 
             resp = client.images.edit(**edit_kwargs)
 
@@ -75,8 +66,6 @@ class GenerationService:
         finally:
             if isinstance(image, str):
                 image_file.close()
-            if mask is not None and isinstance(mask, str):
-                mask_file.close()
 
         images_b64 = [d.b64_json for d in getattr(resp, "data", [])]
         if not images_b64:
