@@ -232,9 +232,8 @@ INSTAGRAM_BASE_URL = "https://graph.facebook.com/v19.0"
 async def create_rupload_video_container(ig_id: str, access_token: str) -> dict:
     url = f"{INSTAGRAM_BASE_URL}/{ig_id}/media"
     payload = {
-        "media_type": "REELS",
+        "media_type": "VIDEO",
         "upload_type": "resumable",
-        "is_carousel_item": "true",
         "access_token": access_token
     }
     async with httpx.AsyncClient(timeout=60.0) as client:
