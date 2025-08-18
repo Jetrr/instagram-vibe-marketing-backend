@@ -82,7 +82,6 @@ class GenerationService:
         if not images_b64:
             raise HTTPException(status_code=502, detail="OpenAI returned no images")
 
-        # ---------- GCS Upload -----------
         urls = []
         folder = f"openai_edits/{uuid.uuid4().hex}"
         for idx, b64_str in enumerate(images_b64):
