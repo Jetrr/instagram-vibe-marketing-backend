@@ -24,3 +24,9 @@ class PostVideoCarouselRequest(BaseModel):
     caption: str
     content: List[VideoCarouselItem]
     collaborators: str = None   # Optional, if you wish
+
+class PostReelRequest(BaseModel):
+    IG_ID: str
+    access_token: str
+    caption: str
+    content: str

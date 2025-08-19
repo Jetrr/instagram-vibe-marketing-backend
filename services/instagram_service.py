@@ -3,7 +3,7 @@ import asyncio
 import httpx
 from fastapi import HTTPException
 from typing import List, Optional
-from schemas.instagram_post import PostCarouselRequest
+from schemas.instagram_post import PostCarouselRequest, PostReelRequest
 import os
 import tempfile
 
@@ -222,6 +222,8 @@ async def post_instagram_carousel(payload: PostCarouselRequest):
 #         "container_ids": container_ids
 #     }
 
+#video
+
 import httpx
 import asyncio
 import time
@@ -285,6 +287,7 @@ async def poll_container_status(container_id: str, access_token: str, what="chil
     raise HTTPException(status_code=504, detail=f"Timed out waiting for IG {what} processing.")
 
 async def post_instagram_video_carousel(payload):
+
     ig_id = payload.IG_ID
     access_token = payload.access_token
     caption = payload.caption
@@ -334,3 +337,77 @@ async def post_instagram_video_carousel(payload):
         "publish_response": publish_resp,
         "media_ids": media_ids
     }
+
+
+
+# REEL
+import aiohttp
+
+async def create_reel_container(ig_id, access_token, video_url, caption):
+    url = f"https://graph.facebook.com/v19.0/{ig_id}/media"
+    params = {
+        "media_type": "REELS",
+        "video_url": video_url,
+        "caption": caption,
+        "access_token": access_token,
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, params=params) as resp:
+            data = await resp.json()
+            if 'id' in data:
+                return data['id']  # container id
+            raise Exception(f"Container creation failed: {data}")
+
+async def publish_media(ig_id, access_token, creation_id):
+    url = f"https://graph.facebook.com/v19.0/{ig_id}/media_publish"
+    params = {
+        "creation_id": creation_id,
+        "access_token": access_token,
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, params=params) as resp:
+            data = await resp.json()
+            if 'id' in data:
+                return data['id']  # media id of the posted Reel
+            raise Exception(f"Publish failed: {data}")
+        
+import aiohttp
+import asyncio
+
+async def wait_for_media_ready(ig_id, creation_id, access_token, max_attempts=50, interval_seconds=5):
+    url = f"https://graph.facebook.com/v19.0/{creation_id}"
+    params = {
+        "fields": "status_code",
+        "access_token": access_token,
+    }
+    async with aiohttp.ClientSession() as session:
+        for attempt in range(max_attempts):
+            async with session.get(url, params=params) as resp:
+                data = await resp.json()
+                status = data.get("status_code")
+                if status == "FINISHED":
+                    return True
+                elif status in ["ERROR", "EXPIRED"]:
+                    raise Exception(f"Media processing failed: {data}")
+                # Optionally print status for logs
+                await asyncio.sleep(interval_seconds)
+        raise Exception("Timeout waiting for media to become ready.")
+async def post_instagram_reel(payload: PostReelRequest):
+    ig_id = payload.IG_ID
+    access_token = payload.access_token
+    caption = payload.caption
+    content = payload.content 
+    # 1. Create container
+    try:
+        creation_id = await create_reel_container(ig_id, access_token, content, caption)
+    except Exception as e:
+        raise HTTPException(400, detail=f"Container creation failed: {str(e)}")
+    await wait_for_media_ready(ig_id, creation_id, access_token)
+
+    # 2. Publish
+    try:
+        media_id = await publish_media(ig_id, access_token, creation_id)
+    except Exception as e:
+        raise HTTPException(400, detail=f"Publish failed: {str(e)}")
+
+    return {"media_id": media_id}
