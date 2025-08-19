@@ -12,7 +12,10 @@ COPY requirements.txt .
 RUN python -m pip install "pip<24.1"
 RUN pip install --no-cache-dir -r requirements.txt
 
+
 COPY . .
+
+ENV GOOGLE_APPLICATION_CREDENTIALS="/app/jetrr-ai-agent-5b34f6931fbf.json"
 
 EXPOSE 8080
 
