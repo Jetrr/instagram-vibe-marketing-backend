@@ -166,24 +166,17 @@ def fetch_and_upload_image(image_url: str) -> (str, str):
 from google.cloud import storage
 from datetime import timedelta
 
-def generate_gcs_signed_url(gcs_uri: str, expiration_minutes: int = 60 * 24 * 7) -> str:
-    """
-    gcs_uri: 'gs://bucket-name/path/to/object'
-    expiration_minutes: link validity (default 1 week)
-    """
-    if not gcs_uri.startswith("gs://"):
-        raise ValueError("gcs_uri must start with 'gs://'")
-    bucket_name, *path_parts = gcs_uri.replace("gs://", "").split("/", 1)
-    blob_path = path_parts[0] if path_parts else ""
+def get_signed_url(bucket_name, blob_name, expiration_minutes=60):
+    from google.cloud import storage
+    from datetime import timedelta
     client = storage.Client()
     bucket = client.bucket(bucket_name)
-    blob = bucket.blob(blob_path)
-    url = blob.generate_signed_url(
+    blob = bucket.blob(blob_name)
+    return blob.generate_signed_url(
         version="v4",
         expiration=timedelta(minutes=expiration_minutes),
         method="GET"
     )
-    return url
 
 class VertexVideoService:
     @staticmethod
@@ -226,10 +219,11 @@ class VertexVideoService:
 
         if operation.response and operation.result.generated_videos:
             gcs_uri = operation.result.generated_videos[0].video.uri
-            # signed_url = generate_gcs_signed_url(gcs_uri)
+            bucket, blob = gcs_uri.replace("gs://", "").split("/", 1)
+            signed_url = get_signed_url(bucket, blob)
             return {
                 "video_gcs_uri": gcs_uri,
-                "video_signed_url": "signed_url",
+                "video_signed_url": signed_url,
             }
 
         raise HTTPException(status_code=500, detail="Video generation failed.")
