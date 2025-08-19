@@ -226,10 +226,10 @@ class VertexVideoService:
 
         if operation.response and operation.result.generated_videos:
             gcs_uri = operation.result.generated_videos[0].video.uri
-            signed_url = generate_gcs_signed_url(gcs_uri)
+            # signed_url = generate_gcs_signed_url(gcs_uri)
             return {
                 "video_gcs_uri": gcs_uri,
-                "video_signed_url": signed_url,
+                "video_signed_url": "signed_url",
             }
 
         raise HTTPException(status_code=500, detail="Video generation failed.")
