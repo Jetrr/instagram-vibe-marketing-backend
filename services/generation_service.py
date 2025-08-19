@@ -217,6 +217,13 @@ class VertexVideoService:
             operation = client.operations.get(operation)
             print(operation)
 
+        #
+        import google.auth
+        creds, _ = google.auth.default()
+        print("Service account used:", getattr(creds, 'service_account_email', None))
+        import google.cloud.storage
+        print("google-cloud-storage version:", google.cloud.storage.__version__)
+
         if operation.response and operation.result.generated_videos:
             gcs_uri = operation.result.generated_videos[0].video.uri
             bucket, blob = gcs_uri.replace("gs://", "").split("/", 1)
