@@ -13,6 +13,8 @@ def create_carousel(payload: CarouselRequest):
         render_slide = style_module.render_slide
     elif character=='category_2':
         render_slide = style_module.render_slide
+    elif character=='category_3':
+        render_slide = style_module.render_slide
     else:
         raise ValueError(f"Unsupported character style: {character}")
     
