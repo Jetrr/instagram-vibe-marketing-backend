@@ -1,4 +1,3 @@
-# endpoints/carousel.py
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
@@ -9,7 +8,6 @@ import zipfile
 from google.cloud import storage
 import uuid
 import os
-
 
 router = APIRouter()
 GCS_BUCKET_NAME = "vibe_marketing"  
@@ -36,6 +34,7 @@ def generate_carousel_and_upload(payload: CarouselRequest):
         return {"folder_id": unique_run_id, "urls": urls}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    
 @router.post("/single/{slide_idx}", response_description="Returns the requested carousel image")
 def generate_single_carousel_image(payload: CarouselRequest, slide_idx: int = 0):
     try:

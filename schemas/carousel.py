@@ -7,6 +7,10 @@ class SlideContent(BaseModel):
     cover_title: Optional[str] = None
     cover_subtitle: Optional[str] = None
 
+    # For simple text-based slides (category_2 etc)
+    content: Optional[str] = None
+    end_title: Optional[str] = None  # For last slide
+
     # For myth slides, these must be set for myth/truth slides
     myth_title: Optional[str] = None
     myth_quote: Optional[str] = None

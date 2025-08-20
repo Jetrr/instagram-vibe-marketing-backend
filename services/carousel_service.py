@@ -8,8 +8,14 @@ from io import BytesIO
 def create_carousel(payload: CarouselRequest):
     character = payload.character.lower()
     style_module = importlib.import_module(f"styles.{character}")
-    render_slide = style_module.render_slide
-
+    print(f"Using style module: {style_module}")
+    if character=='category_1':
+        render_slide = style_module.render_slide
+    elif character=='category_2':
+        render_slide = style_module.render_slide
+    else:
+        raise ValueError(f"Unsupported character style: {character}")
+    
     images_data = []
     for idx, slide in enumerate(payload.slides):
         slide_img = render_slide(slide, idx)
