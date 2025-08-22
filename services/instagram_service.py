@@ -236,7 +236,8 @@ async def create_rupload_video_container(ig_id: str, access_token: str) -> dict:
     payload = {
         "media_type": "VIDEO",
         "upload_type": "resumable",
-        "access_token": access_token
+        "access_token": access_token,
+        "is_carousel_item": "true"
     }
     async with httpx.AsyncClient(timeout=60.0) as client:
         resp = await client.post(url, json=payload)
