@@ -199,7 +199,7 @@ class VertexVideoService:
 
         # 2. Video Generation
         operation = client.models.generate_videos(
-            model="veo-3.0-generate-preview",
+            model="veo-3.0-fast-generate-001",
             prompt=prompt,
             image=Image(gcs_uri=image_gcs_uri, mime_type=mime_type),
             config=GenerateVideosConfig(
